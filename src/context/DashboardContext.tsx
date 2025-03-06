@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
 import {
   StoreStats,
@@ -155,6 +154,19 @@ const mockStockDistributionHome: StockDistribution[] = [
   { name: "Garden", value: 10, color: "#f39c12" },
 ];
 
+interface ExcelData {
+  products: Product[];
+  salesData7Days: SalesData[];
+  salesData30Days: SalesData[];
+  salesData90Days: SalesData[];
+  salesDataYear: SalesData[];
+  stockDistributionAll: StockDistribution[];
+  stockDistributionElectronics: StockDistribution[];
+  stockDistributionClothing: StockDistribution[];
+  stockDistributionFood: StockDistribution[];
+  stockDistributionHome: StockDistribution[];
+}
+
 interface DashboardContextProps {
   stats: StoreStats;
   products: Product[];
@@ -174,6 +186,8 @@ interface DashboardContextProps {
   setCurrentPage: (page: number) => void;
   totalPages: number;
   filteredProducts: Product[];
+  updateDashboardData: (data: ExcelData) => void;
+  getDashboardData: () => ExcelData;
 }
 
 const DashboardContext = createContext<DashboardContextProps | undefined>(undefined);
@@ -186,11 +200,50 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Apply filters to products
-  const filteredProducts = useMemo(() => {
-    let filtered = [...mockProducts];
+  const [dashboardProducts, setDashboardProducts] = useState<Product[]>(mockProducts);
+  const [dashboardSalesData7Days, setDashboardSalesData7Days] = useState<SalesData[]>(mockSalesData7Days);
+  const [dashboardSalesData30Days, setDashboardSalesData30Days] = useState<SalesData[]>(mockSalesData30Days);
+  const [dashboardSalesData90Days, setDashboardSalesData90Days] = useState<SalesData[]>(mockSalesData90Days);
+  const [dashboardSalesDataYear, setDashboardSalesDataYear] = useState<SalesData[]>(mockSalesDataYear);
+  const [dashboardStockDistributionAll, setDashboardStockDistributionAll] = useState<StockDistribution[]>(mockStockDistributionAll);
+  const [dashboardStockDistributionElectronics, setDashboardStockDistributionElectronics] = useState<StockDistribution[]>(mockStockDistributionElectronics);
+  const [dashboardStockDistributionClothing, setDashboardStockDistributionClothing] = useState<StockDistribution[]>(mockStockDistributionClothing);
+  const [dashboardStockDistributionFood, setDashboardStockDistributionFood] = useState<StockDistribution[]>(mockStockDistributionFood);
+  const [dashboardStockDistributionHome, setDashboardStockDistributionHome] = useState<StockDistribution[]>(mockStockDistributionHome);
+  
+  const stats: StoreStats = useMemo(() => {
+    const totalProducts = dashboardProducts.length;
+    const totalSales = dashboardProducts.reduce((sum, product) => {
+      const avgPrice = (product.storeA.price + product.storeB.price + product.storeC.price) / 3;
+      const totalStock = product.storeA.stock + product.storeB.stock + product.storeC.stock;
+      return sum + (avgPrice * totalStock);
+    }, 0);
     
-    // Apply store filter
+    const avgMargin = Math.round(
+      dashboardProducts.reduce((sum, product) => sum + product.margin, 0) / totalProducts
+    );
+    
+    const outOfStock = dashboardProducts.filter(product => 
+      product.storeA.status === "out-of-stock" &&
+      product.storeB.status === "out-of-stock" &&
+      product.storeC.status === "out-of-stock"
+    ).length;
+    
+    return {
+      totalProducts,
+      totalProductsChange: 12,
+      totalSales: Math.round(totalSales),
+      totalSalesChange: 8,
+      avgMargin,
+      avgMarginChange: -2,
+      outOfStock,
+      outOfStockLabel: "items",
+    };
+  }, [dashboardProducts]);
+  
+  const filteredProducts = useMemo(() => {
+    let filtered = [...dashboardProducts];
+    
     if (storeFilter !== "all") {
       filtered = filtered.filter(product => {
         const storeData = product[storeFilter];
@@ -198,7 +251,6 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       });
     }
     
-    // Apply status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter(product => {
         if (storeFilter === "all") {
@@ -213,7 +265,6 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       });
     }
     
-    // Apply sorting
     filtered.sort((a, b) => {
       switch (sortOption) {
         case "price-high":
@@ -238,7 +289,7 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
           if (storeFilter === "all") {
             const totalStockA = a.storeA.stock + a.storeB.stock + a.storeC.stock;
             const totalStockB = b.storeA.stock + b.storeB.stock + b.storeC.stock;
-            return totalStockB - totalStockA; // Higher stock is better selling
+            return totalStockB - totalStockA;
           } else {
             return b[storeFilter].stock - a[storeFilter].stock;
           }
@@ -246,55 +297,82 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     });
     
     return filtered;
-  }, [storeFilter, sortOption, statusFilter]);
+  }, [dashboardProducts, storeFilter, sortOption, statusFilter]);
 
-  // Update total pages when filtered products change
   const totalPages = Math.ceil(filteredProducts.length / 10);
 
-  // Reset current page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [storeFilter, sortOption, statusFilter]);
 
-  // Get sales data based on time range
   const salesData = useMemo(() => {
     switch (timeRange) {
       case "30days":
-        return mockSalesData30Days;
+        return dashboardSalesData30Days;
       case "90days":
-        return mockSalesData90Days;
+        return dashboardSalesData90Days;
       case "year":
-        return mockSalesDataYear;
+        return dashboardSalesDataYear;
       default:
-        return mockSalesData7Days;
+        return dashboardSalesData7Days;
     }
-  }, [timeRange]);
+  }, [timeRange, dashboardSalesData7Days, dashboardSalesData30Days, dashboardSalesData90Days, dashboardSalesDataYear]);
 
-  // Get stock distribution based on category filter
   const stockDistribution = useMemo(() => {
     switch (categoryFilter) {
       case "electronics":
-        return mockStockDistributionElectronics;
+        return dashboardStockDistributionElectronics;
       case "clothing":
-        return mockStockDistributionClothing;
+        return dashboardStockDistributionClothing;
       case "food":
-        return mockStockDistributionFood;
+        return dashboardStockDistributionFood;
       case "home":
-        return mockStockDistributionHome;
+        return dashboardStockDistributionHome;
       default:
-        return mockStockDistributionAll;
+        return dashboardStockDistributionAll;
     }
-  }, [categoryFilter]);
+  }, [
+    categoryFilter,
+    dashboardStockDistributionAll,
+    dashboardStockDistributionElectronics,
+    dashboardStockDistributionClothing,
+    dashboardStockDistributionFood,
+    dashboardStockDistributionHome
+  ]);
 
-  // In a real app, these would be derived from API calls, etc.
-  const stats = mockStoreStats;
-  const products = mockProducts;
+  const updateDashboardData = (data: ExcelData) => {
+    if (data.products.length) setDashboardProducts(data.products);
+    if (data.salesData7Days.length) setDashboardSalesData7Days(data.salesData7Days);
+    if (data.salesData30Days.length) setDashboardSalesData30Days(data.salesData30Days);
+    if (data.salesData90Days.length) setDashboardSalesData90Days(data.salesData90Days);
+    if (data.salesDataYear.length) setDashboardSalesDataYear(data.salesDataYear);
+    if (data.stockDistributionAll.length) setDashboardStockDistributionAll(data.stockDistributionAll);
+    if (data.stockDistributionElectronics.length) setDashboardStockDistributionElectronics(data.stockDistributionElectronics);
+    if (data.stockDistributionClothing.length) setDashboardStockDistributionClothing(data.stockDistributionClothing);
+    if (data.stockDistributionFood.length) setDashboardStockDistributionFood(data.stockDistributionFood);
+    if (data.stockDistributionHome.length) setDashboardStockDistributionHome(data.stockDistributionHome);
+  };
+
+  const getDashboardData = (): ExcelData => {
+    return {
+      products: dashboardProducts,
+      salesData7Days: dashboardSalesData7Days,
+      salesData30Days: dashboardSalesData30Days,
+      salesData90Days: dashboardSalesData90Days,
+      salesDataYear: dashboardSalesDataYear,
+      stockDistributionAll: dashboardStockDistributionAll,
+      stockDistributionElectronics: dashboardStockDistributionElectronics,
+      stockDistributionClothing: dashboardStockDistributionClothing,
+      stockDistributionFood: dashboardStockDistributionFood,
+      stockDistributionHome: dashboardStockDistributionHome,
+    };
+  };
 
   return (
     <DashboardContext.Provider
       value={{
         stats,
-        products,
+        products: dashboardProducts,
         salesData,
         stockDistribution,
         storeFilter,
@@ -311,6 +389,8 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
         setCurrentPage,
         totalPages,
         filteredProducts,
+        updateDashboardData,
+        getDashboardData,
       }}
     >
       {children}

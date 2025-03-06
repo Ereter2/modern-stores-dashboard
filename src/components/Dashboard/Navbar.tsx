@@ -1,108 +1,56 @@
 
 import React from "react";
-import { Bell, BarChart3, LayoutDashboard, Menu, Settings, User } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import ThemeToggle from "./ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
+import { Button } from "@/components/ui/button";
+import { LayoutDashboard, LineChart } from "lucide-react";
+import ImportExportButton from "./ImportExportButton";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   
   return (
-    <div className="border-b border-border/40 backdrop-blur-sm sticky top-0 z-10">
-      <div className="flex items-center justify-between py-4 px-6 animate-fade-in">
-        <div className="flex items-center space-x-3">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Stores Dashboard
-          </h1>
-          <div className="flex items-center space-x-1.5 bg-positive/20 text-positive text-xs font-medium px-2.5 py-1 rounded-full">
-            <span className="h-1.5 w-1.5 bg-positive rounded-full animate-pulse-slow"></span>
-            <span>Live Data</span>
+    <header className="border-b border-border bg-secondary/10 backdrop-blur-lg sticky top-0 z-50">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center gap-6">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center">
+                <span className="font-bold text-white">S</span>
+              </div>
+              <span className="font-semibold text-lg hidden sm:block">Stores Dashboard</span>
+            </Link>
+            <div className="hidden md:flex items-center space-x-1">
+              <Link to="/">
+                <Button 
+                  variant={location.pathname === "/" ? "default" : "ghost"} 
+                  size="sm"
+                  className={location.pathname === "/" ? "bg-violet-600 hover:bg-violet-700" : ""}
+                >
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Link to="/charts">
+                <Button 
+                  variant={location.pathname === "/charts" ? "default" : "ghost"} 
+                  size="sm"
+                  className={location.pathname === "/charts" ? "bg-violet-600 hover:bg-violet-700" : ""}
+                >
+                  <LineChart className="h-4 w-4 mr-2" />
+                  Charts
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <span className="text-xs px-2 py-1 bg-positive/10 text-positive rounded-full">Live Data</span>
+            <ImportExportButton />
+            <ThemeToggle />
           </div>
         </div>
-
-        <div className="flex items-center space-x-2 md:space-x-4">
-          <nav className="hidden md:flex items-center space-x-1">
-            <Link to="/">
-              <Button 
-                variant={location.pathname === "/" ? "secondary" : "ghost"} 
-                size="sm"
-                className="flex items-center gap-1.5"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                <span>Dashboard</span>
-              </Button>
-            </Link>
-            <Link to="/charts">
-              <Button 
-                variant={location.pathname === "/charts" ? "secondary" : "ghost"} 
-                size="sm"
-                className="flex items-center gap-1.5"
-              >
-                <BarChart3 className="h-4 w-4" />
-                <span>Charts</span>
-              </Button>
-            </Link>
-          </nav>
-
-          <ThemeToggle />
-          
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full"></span>
-          </Button>
-          
-          <Button variant="ghost" size="icon">
-            <Settings className="h-5 w-5" />
-          </Button>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                <Avatar className="h-9 w-9 border border-primary/20">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="User Avatar" />
-                  <AvatarFallback>US</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">John Doe</p>
-                  <p className="text-xs leading-none text-muted-foreground">john.doe@example.com</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
-        </div>
       </div>
-    </div>
+    </header>
   );
 };
 
