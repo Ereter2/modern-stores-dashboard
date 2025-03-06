@@ -13,6 +13,22 @@ import {
 import { useDashboard } from "@/context/DashboardContext";
 import FilterDropdown from "./FilterDropdown";
 
+// Improved color palette for better contrast
+const CHART_COLORS = {
+  storeA: {
+    stroke: "#9b59b6", // Purple
+    fill: "#9b59b6",
+  },
+  storeB: {
+    stroke: "#3498db", // Blue
+    fill: "#3498db",
+  },
+  storeC: {
+    stroke: "#e74c3c", // Red
+    fill: "#e74c3c",
+  },
+};
+
 const SalesChart: React.FC = () => {
   const { salesData, timeRange, setTimeRange } = useDashboard();
   const [activeStore, setActiveStore] = useState<string | null>(null);
@@ -49,42 +65,42 @@ const SalesChart: React.FC = () => {
           <AreaChart data={salesData}>
             <defs>
               <linearGradient id="colorStoreA" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#9b87f5" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#9b87f5" stopOpacity={0} />
+                <stop offset="5%" stopColor={CHART_COLORS.storeA.fill} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={CHART_COLORS.storeA.fill} stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorStoreB" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7E69AB" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#7E69AB" stopOpacity={0} />
+                <stop offset="5%" stopColor={CHART_COLORS.storeB.fill} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={CHART_COLORS.storeB.fill} stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorStoreC" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6E59A5" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#6E59A5" stopOpacity={0} />
+                <stop offset="5%" stopColor={CHART_COLORS.storeC.fill} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={CHART_COLORS.storeC.fill} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="day" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+            <XAxis dataKey="day" stroke="currentColor" fontSize={12} tickLine={false} axisLine={false} />
             <YAxis
-              stroke="#6b7280"
+              stroke="currentColor"
               fontSize={12}
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => `$${value}`}
             />
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" opacity={0.1} />
             <Tooltip
               contentStyle={{
-                backgroundColor: "rgba(30, 30, 46, 0.9)",
-                borderColor: "rgba(255, 255, 255, 0.1)",
+                backgroundColor: "var(--secondary)",
+                borderColor: "var(--border)",
                 borderRadius: "0.5rem",
                 boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
               }}
-              labelStyle={{ color: "#f3f4f6", marginBottom: "0.5rem" }}
+              labelStyle={{ color: "var(--foreground)", marginBottom: "0.5rem" }}
               formatter={(value: number) => [`$${value}`, ""]}
             />
             <Legend
               formatter={(value) => (
                 <span
                   style={{
-                    color: getOpacity(value) === 1 ? "#f3f4f6" : "#9ca3af",
+                    color: getOpacity(value) === 1 ? "var(--foreground)" : "var(--muted-foreground)",
                     cursor: "pointer",
                   }}
                   onClick={() => handleLegendClick(value)}
@@ -96,7 +112,7 @@ const SalesChart: React.FC = () => {
             <Area
               type="monotone"
               dataKey="storeA"
-              stroke="#9b87f5"
+              stroke={CHART_COLORS.storeA.stroke}
               fillOpacity={1}
               fill="url(#colorStoreA)"
               strokeWidth={2}
@@ -107,7 +123,7 @@ const SalesChart: React.FC = () => {
             <Area
               type="monotone"
               dataKey="storeB"
-              stroke="#7E69AB"
+              stroke={CHART_COLORS.storeB.stroke}
               fillOpacity={1}
               fill="url(#colorStoreB)"
               strokeWidth={2}
@@ -118,7 +134,7 @@ const SalesChart: React.FC = () => {
             <Area
               type="monotone"
               dataKey="storeC"
-              stroke="#6E59A5"
+              stroke={CHART_COLORS.storeC.stroke}
               fillOpacity={1}
               fill="url(#colorStoreC)"
               strokeWidth={2}

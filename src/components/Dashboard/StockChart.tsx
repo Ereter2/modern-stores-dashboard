@@ -1,8 +1,18 @@
 
 import React from "react";
-import { ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip } from "recharts";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { useDashboard } from "@/context/DashboardContext";
 import FilterDropdown from "./FilterDropdown";
+
+// Improved color palette for better contrast
+const CHART_COLORS = [
+  "#9b59b6", // Purple
+  "#3498db", // Blue
+  "#e74c3c", // Red
+  "#2ecc71", // Green
+  "#f39c12", // Orange
+  "#1abc9c", // Turquoise
+];
 
 const StockChart: React.FC = () => {
   const { stockDistribution, categoryFilter, setCategoryFilter } = useDashboard();
@@ -29,6 +39,12 @@ const StockChart: React.FC = () => {
     return null;
   };
 
+  // Apply new colors to data
+  const colorizedData = stockDistribution.map((item, index) => ({
+    ...item,
+    color: CHART_COLORS[index % CHART_COLORS.length],
+  }));
+
   return (
     <div className="glass-card rounded-lg h-full animate-slide-up animation-delay-500">
       <div className="p-5 border-b border-border flex items-center justify-between">
@@ -44,7 +60,7 @@ const StockChart: React.FC = () => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={stockDistribution}
+              data={colorizedData}
               cx="50%"
               cy="50%"
               innerRadius={80}
@@ -71,7 +87,7 @@ const StockChart: React.FC = () => {
                   <text
                     x={x}
                     y={y}
-                    fill="#f3f4f6"
+                    fill="currentColor"
                     textAnchor={x > cx ? "start" : "end"}
                     dominantBaseline="central"
                     className="text-xs"
@@ -81,7 +97,7 @@ const StockChart: React.FC = () => {
                 );
               }}
             >
-              {stockDistribution.map((entry, index) => (
+              {colorizedData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
