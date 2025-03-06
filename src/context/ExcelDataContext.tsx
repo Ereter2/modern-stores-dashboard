@@ -31,26 +31,70 @@ export const ExcelDataProvider: React.FC<{ children: ReactNode }> = ({ children 
   const handleImport = async (file: File): Promise<ExcelData | null> => {
     try {
       setIsImporting(true);
+      console.log("Starting import process...");
       
       // Read the Excel file
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       
-      // Process each sheet
-      const products = XLSX.utils.sheet_to_json<Product>(workbook.Sheets["Products"] || {});
-      const salesData7Days = XLSX.utils.sheet_to_json<SalesData>(workbook.Sheets["SalesData7Days"] || {});
-      const salesData30Days = XLSX.utils.sheet_to_json<SalesData>(workbook.Sheets["SalesData30Days"] || {});
-      const salesData90Days = XLSX.utils.sheet_to_json<SalesData>(workbook.Sheets["SalesData90Days"] || {});
-      const salesDataYear = XLSX.utils.sheet_to_json<SalesData>(workbook.Sheets["SalesDataYear"] || {});
-      const stockDistributionAll = XLSX.utils.sheet_to_json<StockDistribution>(workbook.Sheets["StockDistAll"] || {});
-      const stockDistributionElectronics = XLSX.utils.sheet_to_json<StockDistribution>(workbook.Sheets["StockDistElec"] || {});
-      const stockDistributionClothing = XLSX.utils.sheet_to_json<StockDistribution>(workbook.Sheets["StockDistCloth"] || {});
-      const stockDistributionFood = XLSX.utils.sheet_to_json<StockDistribution>(workbook.Sheets["StockDistFood"] || {});
-      const stockDistributionHome = XLSX.utils.sheet_to_json<StockDistribution>(workbook.Sheets["StockDistHome"] || {});
+      console.log("Available sheets:", workbook.SheetNames);
       
-      // Validate data
+      // Check if we have any sheets at all
+      if (!workbook.SheetNames.length) {
+        toast.error("The Excel file doesn't contain any sheets");
+        return null;
+      }
+      
+      // Try to find the Products sheet (case-insensitive search)
+      const productsSheetName = workbook.SheetNames.find(
+        name => name.toLowerCase() === "products"
+      ) || workbook.SheetNames[0]; // Fall back to first sheet
+      
+      console.log("Using sheet for products:", productsSheetName);
+      
+      // Process each sheet, providing fallbacks
+      const products = XLSX.utils.sheet_to_json<Product>(
+        workbook.Sheets[productsSheetName] || {}
+      );
+      
+      // Log the first product to help debug
+      if (products.length) {
+        console.log("First product sample:", products[0]);
+      } else {
+        console.log("No products found in sheet:", productsSheetName);
+      }
+      
+      // Function to safely get a sheet and convert to JSON
+      const getSheetData = <T,>(sheetNameOptions: string[]): T[] => {
+        for (const name of sheetNameOptions) {
+          const sheetName = workbook.SheetNames.find(
+            s => s.toLowerCase() === name.toLowerCase()
+          );
+          if (sheetName && workbook.Sheets[sheetName]) {
+            return XLSX.utils.sheet_to_json<T>(workbook.Sheets[sheetName]);
+          }
+        }
+        return [];
+      };
+      
+      const salesData7Days = getSheetData<SalesData>(['SalesData7Days', '7 Days', 'Sales7Days']);
+      const salesData30Days = getSheetData<SalesData>(['SalesData30Days', '30 Days', 'Sales30Days']);
+      const salesData90Days = getSheetData<SalesData>(['SalesData90Days', '90 Days', 'Sales90Days']);
+      const salesDataYear = getSheetData<SalesData>(['SalesDataYear', 'Year', 'YearlySales']);
+      const stockDistributionAll = getSheetData<StockDistribution>(['StockDistAll', 'Stock All', 'StockDistribution']);
+      const stockDistributionElectronics = getSheetData<StockDistribution>(['StockDistElec', 'Electronics', 'StockElectronics']);
+      const stockDistributionClothing = getSheetData<StockDistribution>(['StockDistCloth', 'Clothing', 'StockClothing']);
+      const stockDistributionFood = getSheetData<StockDistribution>(['StockDistFood', 'Food', 'StockFood']);
+      const stockDistributionHome = getSheetData<StockDistribution>(['StockDistHome', 'Home', 'StockHome']);
+      
+      // Validate data - now more flexible but still shows user feedback
       if (!products.length) {
-        toast.error("No product data found in the Excel file");
+        const errorMessage = `No product data found in the Excel file. Please ensure your file has a sheet named 'Products' with columns for product details.`;
+        toast.error(errorMessage);
+        console.error(errorMessage);
+        
+        // Show sheet names to help user
+        toast.error(`Available sheets: ${workbook.SheetNames.join(', ')}`);
         return null;
       }
 
