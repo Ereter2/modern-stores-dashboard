@@ -1,8 +1,8 @@
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DownloadCloud, UploadCloud, Info } from "lucide-react";
+import { DownloadCloud, UploadCloud, Info, Loader2 } from "lucide-react";
 import { useExcelData } from "@/context/ExcelDataContext";
 import { useDashboard } from "@/context/DashboardContext";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ const ImportExportButton: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { handleImport, handleExport, isImporting } = useExcelData();
   const { updateDashboardData, getDashboardData } = useDashboard();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const triggerFileInput = () => {
     if (fileInputRef.current) {
@@ -21,23 +22,41 @@ const ImportExportButton: React.FC = () => {
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      toast.info(`Importing file: ${file.name}`, {
-        description: "Please wait while we process your data...",
-        duration: 2000
-      });
-      
-      const excelData = await handleImport(file);
-      if (excelData) {
-        updateDashboardData(excelData);
+      try {
+        toast.info(`Importing file: ${file.name}`, {
+          description: "Please wait while we process your data...",
+          duration: 2000
+        });
+        
+        setIsPopoverOpen(false);
+        const excelData = await handleImport(file);
+        
+        if (excelData && excelData.products && excelData.products.length > 0) {
+          console.log("Imported Excel data:", excelData);
+          updateDashboardData(excelData);
+          toast.success(`Successfully imported ${excelData.products.length} products`);
+        } else {
+          toast.error("Failed to import data. No valid products found.");
+        }
+      } catch (error) {
+        console.error("Error in import process:", error);
+        toast.error("An unexpected error occurred during import");
+      } finally {
+        // Reset the input
+        e.target.value = '';
       }
-      // Reset the input
-      e.target.value = '';
     }
   };
 
   const onExport = () => {
-    const data = getDashboardData();
-    handleExport(data);
+    try {
+      const data = getDashboardData();
+      handleExport(data);
+      setIsPopoverOpen(false);
+    } catch (error) {
+      console.error("Error during export:", error);
+      toast.error("Failed to export data");
+    }
   };
   
   const showExcelFormat = () => {
@@ -60,13 +79,18 @@ const ImportExportButton: React.FC = () => {
 
   return (
     <>
-      <Popover>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
           <Button 
             variant="outline" 
             className="border-violet-500/20 hover:border-violet-500/50 bg-background hover:bg-violet-500/10"
           >
-            <DownloadCloud className="mr-2 h-4 w-4 text-violet-500" /> Import/Export
+            {isImporting ? (
+              <Loader2 className="mr-2 h-4 w-4 text-violet-500 animate-spin" />
+            ) : (
+              <DownloadCloud className="mr-2 h-4 w-4 text-violet-500" />
+            )}
+            Import/Export
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-64" align="end">
@@ -76,7 +100,11 @@ const ImportExportButton: React.FC = () => {
               className="justify-start"
               disabled={isImporting}
             >
-              <UploadCloud className="mr-2 h-4 w-4" />
+              {isImporting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <UploadCloud className="mr-2 h-4 w-4" />
+              )}
               Import Excel Data
             </Button>
             <Button 

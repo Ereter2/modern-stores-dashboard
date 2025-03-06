@@ -25,6 +25,20 @@ interface ExcelDataContextType {
 
 const ExcelDataContext = createContext<ExcelDataContextType | undefined>(undefined);
 
+// Create a default empty data structure to prevent UI crashes
+const createEmptyExcelData = (): ExcelData => ({
+  products: [],
+  salesData7Days: [],
+  salesData30Days: [],
+  salesData90Days: [],
+  salesDataYear: [],
+  stockDistributionAll: [],
+  stockDistributionElectronics: [],
+  stockDistributionClothing: [],
+  stockDistributionFood: [],
+  stockDistributionHome: [],
+});
+
 export const ExcelDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isImporting, setIsImporting] = useState(false);
 
@@ -53,9 +67,16 @@ export const ExcelDataProvider: React.FC<{ children: ReactNode }> = ({ children 
       console.log("Using sheet for products:", productsSheetName);
       
       // Process each sheet, providing fallbacks
-      const products = XLSX.utils.sheet_to_json<Product>(
-        workbook.Sheets[productsSheetName] || {}
-      );
+      let products: Product[] = [];
+      try {
+        products = XLSX.utils.sheet_to_json<Product>(
+          workbook.Sheets[productsSheetName] || {}
+        );
+      } catch (error) {
+        console.error("Error parsing products sheet:", error);
+        toast.error("Failed to parse Products sheet. Please check the format.");
+        return null;
+      }
       
       // Log the first product to help debug
       if (products.length) {
@@ -66,15 +87,20 @@ export const ExcelDataProvider: React.FC<{ children: ReactNode }> = ({ children 
       
       // Function to safely get a sheet and convert to JSON
       const getSheetData = <T,>(sheetNameOptions: string[]): T[] => {
-        for (const name of sheetNameOptions) {
-          const sheetName = workbook.SheetNames.find(
-            s => s.toLowerCase() === name.toLowerCase()
-          );
-          if (sheetName && workbook.Sheets[sheetName]) {
-            return XLSX.utils.sheet_to_json<T>(workbook.Sheets[sheetName]);
+        try {
+          for (const name of sheetNameOptions) {
+            const sheetName = workbook.SheetNames.find(
+              s => s.toLowerCase() === name.toLowerCase()
+            );
+            if (sheetName && workbook.Sheets[sheetName]) {
+              return XLSX.utils.sheet_to_json<T>(workbook.Sheets[sheetName]);
+            }
           }
+          return [];
+        } catch (error) {
+          console.error(`Error parsing sheet with options ${sheetNameOptions}:`, error);
+          return [];
         }
-        return [];
       };
       
       const salesData7Days = getSheetData<SalesData>(['SalesData7Days', '7 Days', 'Sales7Days']);
@@ -128,16 +154,48 @@ export const ExcelDataProvider: React.FC<{ children: ReactNode }> = ({ children 
       const wb = XLSX.utils.book_new();
       
       // Add sheets for each data type
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.products), "Products");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salesData7Days), "SalesData7Days");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salesData30Days), "SalesData30Days");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salesData90Days), "SalesData90Days");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salesDataYear), "SalesDataYear");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionAll), "StockDistAll");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionElectronics), "StockDistElec");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionClothing), "StockDistCloth");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionFood), "StockDistFood");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionHome), "StockDistHome");
+      if (data.products.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.products), "Products");
+      } else {
+        // Add empty sheet to avoid Excel errors
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([]), "Products");
+      }
+      
+      if (data.salesData7Days.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salesData7Days), "SalesData7Days");
+      }
+      
+      if (data.salesData30Days.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salesData30Days), "SalesData30Days");
+      }
+      
+      if (data.salesData90Days.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salesData90Days), "SalesData90Days");
+      }
+      
+      if (data.salesDataYear.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salesDataYear), "SalesDataYear");
+      }
+      
+      if (data.stockDistributionAll.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionAll), "StockDistAll");
+      }
+      
+      if (data.stockDistributionElectronics.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionElectronics), "StockDistElec");
+      }
+      
+      if (data.stockDistributionClothing.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionClothing), "StockDistCloth");
+      }
+      
+      if (data.stockDistributionFood.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionFood), "StockDistFood");
+      }
+      
+      if (data.stockDistributionHome.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stockDistributionHome), "StockDistHome");
+      }
       
       // Generate and download the file
       XLSX.writeFile(wb, "StoresDashboard_Data.xlsx");

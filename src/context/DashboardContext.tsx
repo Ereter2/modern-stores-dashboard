@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
 import {
   StoreStats,
@@ -212,94 +213,120 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [dashboardStockDistributionHome, setDashboardStockDistributionHome] = useState<StockDistribution[]>(mockStockDistributionHome);
   
   const stats: StoreStats = useMemo(() => {
-    const totalProducts = dashboardProducts.length;
-    const totalSales = dashboardProducts.reduce((sum, product) => {
-      const avgPrice = (product.storeA.price + product.storeB.price + product.storeC.price) / 3;
-      const totalStock = product.storeA.stock + product.storeB.stock + product.storeC.stock;
-      return sum + (avgPrice * totalStock);
-    }, 0);
-    
-    const avgMargin = Math.round(
-      dashboardProducts.reduce((sum, product) => sum + product.margin, 0) / totalProducts
-    );
-    
-    const outOfStock = dashboardProducts.filter(product => 
-      product.storeA.status === "out-of-stock" &&
-      product.storeB.status === "out-of-stock" &&
-      product.storeC.status === "out-of-stock"
-    ).length;
-    
-    return {
-      totalProducts,
-      totalProductsChange: 12,
-      totalSales: Math.round(totalSales),
-      totalSalesChange: 8,
-      avgMargin,
-      avgMarginChange: -2,
-      outOfStock,
-      outOfStockLabel: "items",
-    };
+    try {
+      const totalProducts = dashboardProducts.length;
+      
+      if (totalProducts === 0) {
+        return mockStoreStats;
+      }
+      
+      const totalSales = dashboardProducts.reduce((sum, product) => {
+        const storeAPrice = product.storeA?.price || 0;
+        const storeBPrice = product.storeB?.price || 0;
+        const storeCPrice = product.storeC?.price || 0;
+        
+        const storeAStock = product.storeA?.stock || 0;
+        const storeBStock = product.storeB?.stock || 0;
+        const storeCStock = product.storeC?.stock || 0;
+        
+        const avgPrice = (storeAPrice + storeBPrice + storeCPrice) / 3;
+        const totalStock = storeAStock + storeBStock + storeCStock;
+        
+        return sum + (avgPrice * totalStock);
+      }, 0);
+      
+      const avgMargin = totalProducts > 0 
+        ? Math.round(
+            dashboardProducts.reduce((sum, product) => sum + (product.margin || 0), 0) / totalProducts
+          )
+        : 0;
+      
+      const outOfStock = dashboardProducts.filter(product => 
+        (product.storeA?.status === "out-of-stock" || !product.storeA) &&
+        (product.storeB?.status === "out-of-stock" || !product.storeB) &&
+        (product.storeC?.status === "out-of-stock" || !product.storeC)
+      ).length;
+      
+      return {
+        totalProducts,
+        totalProductsChange: 12, // Default value
+        totalSales: Math.round(totalSales),
+        totalSalesChange: 8, // Default value
+        avgMargin,
+        avgMarginChange: -2, // Default value
+        outOfStock,
+        outOfStockLabel: "items",
+      };
+    } catch (error) {
+      console.error("Error calculating stats:", error);
+      return mockStoreStats;
+    }
   }, [dashboardProducts]);
   
   const filteredProducts = useMemo(() => {
-    let filtered = [...dashboardProducts];
-    
-    if (storeFilter !== "all") {
-      filtered = filtered.filter(product => {
-        const storeData = product[storeFilter];
-        return storeData.stock > 0;
-      });
-    }
-    
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(product => {
-        if (storeFilter === "all") {
-          return (
-            product.storeA.status === statusFilter ||
-            product.storeB.status === statusFilter ||
-            product.storeC.status === statusFilter
-          );
-        } else {
-          return product[storeFilter].status === statusFilter;
+    try {
+      let filtered = [...dashboardProducts];
+      
+      if (storeFilter !== "all") {
+        filtered = filtered.filter(product => {
+          const storeData = product[storeFilter];
+          return storeData && storeData.stock > 0;
+        });
+      }
+      
+      if (statusFilter !== "all") {
+        filtered = filtered.filter(product => {
+          if (storeFilter === "all") {
+            return (
+              (product.storeA && product.storeA.status === statusFilter) ||
+              (product.storeB && product.storeB.status === statusFilter) ||
+              (product.storeC && product.storeC.status === statusFilter)
+            );
+          } else {
+            return product[storeFilter] && product[storeFilter].status === statusFilter;
+          }
+        });
+      }
+      
+      filtered.sort((a, b) => {
+        switch (sortOption) {
+          case "price-high":
+            if (storeFilter === "all") {
+              const avgPriceA = ((a.storeA?.price || 0) + (a.storeB?.price || 0) + (a.storeC?.price || 0)) / 3;
+              const avgPriceB = ((b.storeA?.price || 0) + (b.storeB?.price || 0) + (b.storeC?.price || 0)) / 3;
+              return avgPriceB - avgPriceA;
+            } else {
+              return (b[storeFilter]?.price || 0) - (a[storeFilter]?.price || 0);
+            }
+          case "price-low":
+            if (storeFilter === "all") {
+              const avgPriceA = ((a.storeA?.price || 0) + (a.storeB?.price || 0) + (a.storeC?.price || 0)) / 3;
+              const avgPriceB = ((b.storeA?.price || 0) + (b.storeB?.price || 0) + (b.storeC?.price || 0)) / 3;
+              return avgPriceA - avgPriceB;
+            } else {
+              return (a[storeFilter]?.price || 0) - (b[storeFilter]?.price || 0);
+            }
+          case "margin":
+            return (b.margin || 0) - (a.margin || 0);
+          default: // best-selling
+            if (storeFilter === "all") {
+              const totalStockA = (a.storeA?.stock || 0) + (a.storeB?.stock || 0) + (a.storeC?.stock || 0);
+              const totalStockB = (b.storeA?.stock || 0) + (b.storeB?.stock || 0) + (b.storeC?.stock || 0);
+              return totalStockB - totalStockA;
+            } else {
+              return (b[storeFilter]?.stock || 0) - (a[storeFilter]?.stock || 0);
+            }
         }
       });
+      
+      return filtered;
+    } catch (error) {
+      console.error("Error filtering products:", error);
+      return [];
     }
-    
-    filtered.sort((a, b) => {
-      switch (sortOption) {
-        case "price-high":
-          if (storeFilter === "all") {
-            const avgPriceA = (a.storeA.price + a.storeB.price + a.storeC.price) / 3;
-            const avgPriceB = (b.storeA.price + b.storeB.price + b.storeC.price) / 3;
-            return avgPriceB - avgPriceA;
-          } else {
-            return b[storeFilter].price - a[storeFilter].price;
-          }
-        case "price-low":
-          if (storeFilter === "all") {
-            const avgPriceA = (a.storeA.price + a.storeB.price + a.storeC.price) / 3;
-            const avgPriceB = (b.storeA.price + b.storeB.price + b.storeC.price) / 3;
-            return avgPriceA - avgPriceB;
-          } else {
-            return a[storeFilter].price - b[storeFilter].price;
-          }
-        case "margin":
-          return b.margin - a.margin;
-        default: // best-selling
-          if (storeFilter === "all") {
-            const totalStockA = a.storeA.stock + a.storeB.stock + a.storeC.stock;
-            const totalStockB = b.storeA.stock + b.storeB.stock + b.storeC.stock;
-            return totalStockB - totalStockA;
-          } else {
-            return b[storeFilter].stock - a[storeFilter].stock;
-          }
-      }
-    });
-    
-    return filtered;
   }, [dashboardProducts, storeFilter, sortOption, statusFilter]);
 
-  const totalPages = Math.ceil(filteredProducts.length / 10);
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / 10));
 
   useEffect(() => {
     setCurrentPage(1);
@@ -341,16 +368,51 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   ]);
 
   const updateDashboardData = (data: ExcelData) => {
-    if (data.products.length) setDashboardProducts(data.products);
-    if (data.salesData7Days.length) setDashboardSalesData7Days(data.salesData7Days);
-    if (data.salesData30Days.length) setDashboardSalesData30Days(data.salesData30Days);
-    if (data.salesData90Days.length) setDashboardSalesData90Days(data.salesData90Days);
-    if (data.salesDataYear.length) setDashboardSalesDataYear(data.salesDataYear);
-    if (data.stockDistributionAll.length) setDashboardStockDistributionAll(data.stockDistributionAll);
-    if (data.stockDistributionElectronics.length) setDashboardStockDistributionElectronics(data.stockDistributionElectronics);
-    if (data.stockDistributionClothing.length) setDashboardStockDistributionClothing(data.stockDistributionClothing);
-    if (data.stockDistributionFood.length) setDashboardStockDistributionFood(data.stockDistributionFood);
-    if (data.stockDistributionHome.length) setDashboardStockDistributionHome(data.stockDistributionHome);
+    console.log("Updating dashboard with imported data:", data);
+    try {
+      if (data.products && data.products.length) {
+        console.log(`Setting ${data.products.length} products`);
+        setDashboardProducts(data.products);
+      }
+      
+      if (data.salesData7Days && data.salesData7Days.length) {
+        setDashboardSalesData7Days(data.salesData7Days);
+      }
+      
+      if (data.salesData30Days && data.salesData30Days.length) {
+        setDashboardSalesData30Days(data.salesData30Days);
+      }
+      
+      if (data.salesData90Days && data.salesData90Days.length) {
+        setDashboardSalesData90Days(data.salesData90Days);
+      }
+      
+      if (data.salesDataYear && data.salesDataYear.length) {
+        setDashboardSalesDataYear(data.salesDataYear);
+      }
+      
+      if (data.stockDistributionAll && data.stockDistributionAll.length) {
+        setDashboardStockDistributionAll(data.stockDistributionAll);
+      }
+      
+      if (data.stockDistributionElectronics && data.stockDistributionElectronics.length) {
+        setDashboardStockDistributionElectronics(data.stockDistributionElectronics);
+      }
+      
+      if (data.stockDistributionClothing && data.stockDistributionClothing.length) {
+        setDashboardStockDistributionClothing(data.stockDistributionClothing);
+      }
+      
+      if (data.stockDistributionFood && data.stockDistributionFood.length) {
+        setDashboardStockDistributionFood(data.stockDistributionFood);
+      }
+      
+      if (data.stockDistributionHome && data.stockDistributionHome.length) {
+        setDashboardStockDistributionHome(data.stockDistributionHome);
+      }
+    } catch (error) {
+      console.error("Error updating dashboard data:", error);
+    }
   };
 
   const getDashboardData = (): ExcelData => {
