@@ -33,7 +33,18 @@ const ImportExportButton: React.FC = () => {
         
         if (excelData && excelData.products && excelData.products.length > 0) {
           console.log("Imported Excel data:", excelData);
+          
+          // Mise à jour des données du tableau de bord
           updateDashboardData(excelData);
+          
+          // Vérification que les données ont été correctement enregistrées
+          const savedData = localStorage.getItem('dashboardData');
+          if (savedData) {
+            console.log("Données sauvegardées avec succès dans localStorage");
+          } else {
+            console.error("Échec de sauvegarde dans localStorage");
+          }
+          
           toast.success(`${excelData.products.length} produits importés avec succès`);
         } else {
           toast.error("Échec de l'importation. Aucun produit valide trouvé.");

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
 import {
   StoreStats,
@@ -173,6 +172,7 @@ const loadDataFromLocalStorage = (): ExcelData | null => {
   try {
     const savedData = localStorage.getItem('dashboardData');
     if (savedData) {
+      console.log("Chargement des données depuis localStorage:", savedData.substring(0, 100) + "...");
       return JSON.parse(savedData);
     }
     return null;
@@ -218,6 +218,8 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   
   // Charger les données initiales depuis localStorage ou utiliser les données par défaut
   const initialData = loadDataFromLocalStorage();
+  
+  console.log("Données initiales chargées:", initialData ? "Données trouvées" : "Pas de données, utilisation des valeurs par défaut");
   
   const [dashboardProducts, setDashboardProducts] = useState<Product[]>(
     initialData?.products || mockProducts
@@ -451,11 +453,36 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       
       // Sauvegarder les données mises à jour dans localStorage
       const dataToSave = getDashboardData();
-      localStorage.setItem('dashboardData', JSON.stringify(dataToSave));
+      const dataString = JSON.stringify(dataToSave);
+      console.log("Saving data to localStorage, size:", dataString.length, "bytes");
+      localStorage.setItem('dashboardData', dataString);
     } catch (error) {
       console.error("Error updating dashboard data:", error);
     }
   };
+
+  // Utiliser useEffect pour sauvegarder les données dans localStorage chaque fois qu'elles changent
+  useEffect(() => {
+    try {
+      const dataToSave = getDashboardData();
+      const dataString = JSON.stringify(dataToSave);
+      console.log("Auto-saving data to localStorage, size:", dataString.length, "bytes");
+      localStorage.setItem('dashboardData', dataString);
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde automatique des données:", error);
+    }
+  }, [
+    dashboardProducts, 
+    dashboardSalesData7Days, 
+    dashboardSalesData30Days,
+    dashboardSalesData90Days,
+    dashboardSalesDataYear,
+    dashboardStockDistributionAll,
+    dashboardStockDistributionElectronics,
+    dashboardStockDistributionClothing,
+    dashboardStockDistributionFood,
+    dashboardStockDistributionHome
+  ]);
 
   const getDashboardData = (): ExcelData => {
     return {
@@ -472,7 +499,6 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     };
   };
   
-  // Fonction pour réinitialiser les données à leur état par défaut
   const resetDashboardData = () => {
     try {
       localStorage.removeItem('dashboardData');
