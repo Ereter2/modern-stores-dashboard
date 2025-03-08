@@ -168,6 +168,20 @@ interface ExcelData {
   stockDistributionHome: StockDistribution[];
 }
 
+// Fonction pour charger les données depuis localStorage
+const loadDataFromLocalStorage = (): ExcelData | null => {
+  try {
+    const savedData = localStorage.getItem('dashboardData');
+    if (savedData) {
+      return JSON.parse(savedData);
+    }
+    return null;
+  } catch (error) {
+    console.error("Erreur lors du chargement des données depuis localStorage:", error);
+    return null;
+  }
+};
+
 interface DashboardContextProps {
   stats: StoreStats;
   products: Product[];
@@ -189,6 +203,7 @@ interface DashboardContextProps {
   filteredProducts: Product[];
   updateDashboardData: (data: ExcelData) => void;
   getDashboardData: () => ExcelData;
+  resetDashboardData: () => void;
 }
 
 const DashboardContext = createContext<DashboardContextProps | undefined>(undefined);
@@ -201,16 +216,39 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   
-  const [dashboardProducts, setDashboardProducts] = useState<Product[]>(mockProducts);
-  const [dashboardSalesData7Days, setDashboardSalesData7Days] = useState<SalesData[]>(mockSalesData7Days);
-  const [dashboardSalesData30Days, setDashboardSalesData30Days] = useState<SalesData[]>(mockSalesData30Days);
-  const [dashboardSalesData90Days, setDashboardSalesData90Days] = useState<SalesData[]>(mockSalesData90Days);
-  const [dashboardSalesDataYear, setDashboardSalesDataYear] = useState<SalesData[]>(mockSalesDataYear);
-  const [dashboardStockDistributionAll, setDashboardStockDistributionAll] = useState<StockDistribution[]>(mockStockDistributionAll);
-  const [dashboardStockDistributionElectronics, setDashboardStockDistributionElectronics] = useState<StockDistribution[]>(mockStockDistributionElectronics);
-  const [dashboardStockDistributionClothing, setDashboardStockDistributionClothing] = useState<StockDistribution[]>(mockStockDistributionClothing);
-  const [dashboardStockDistributionFood, setDashboardStockDistributionFood] = useState<StockDistribution[]>(mockStockDistributionFood);
-  const [dashboardStockDistributionHome, setDashboardStockDistributionHome] = useState<StockDistribution[]>(mockStockDistributionHome);
+  // Charger les données initiales depuis localStorage ou utiliser les données par défaut
+  const initialData = loadDataFromLocalStorage();
+  
+  const [dashboardProducts, setDashboardProducts] = useState<Product[]>(
+    initialData?.products || mockProducts
+  );
+  const [dashboardSalesData7Days, setDashboardSalesData7Days] = useState<SalesData[]>(
+    initialData?.salesData7Days || mockSalesData7Days
+  );
+  const [dashboardSalesData30Days, setDashboardSalesData30Days] = useState<SalesData[]>(
+    initialData?.salesData30Days || mockSalesData30Days
+  );
+  const [dashboardSalesData90Days, setDashboardSalesData90Days] = useState<SalesData[]>(
+    initialData?.salesData90Days || mockSalesData90Days
+  );
+  const [dashboardSalesDataYear, setDashboardSalesDataYear] = useState<SalesData[]>(
+    initialData?.salesDataYear || mockSalesDataYear
+  );
+  const [dashboardStockDistributionAll, setDashboardStockDistributionAll] = useState<StockDistribution[]>(
+    initialData?.stockDistributionAll || mockStockDistributionAll
+  );
+  const [dashboardStockDistributionElectronics, setDashboardStockDistributionElectronics] = useState<StockDistribution[]>(
+    initialData?.stockDistributionElectronics || mockStockDistributionElectronics
+  );
+  const [dashboardStockDistributionClothing, setDashboardStockDistributionClothing] = useState<StockDistribution[]>(
+    initialData?.stockDistributionClothing || mockStockDistributionClothing
+  );
+  const [dashboardStockDistributionFood, setDashboardStockDistributionFood] = useState<StockDistribution[]>(
+    initialData?.stockDistributionFood || mockStockDistributionFood
+  );
+  const [dashboardStockDistributionHome, setDashboardStockDistributionHome] = useState<StockDistribution[]>(
+    initialData?.stockDistributionHome || mockStockDistributionHome
+  );
   
   const stats: StoreStats = useMemo(() => {
     try {
@@ -410,6 +448,10 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (data.stockDistributionHome && data.stockDistributionHome.length) {
         setDashboardStockDistributionHome(data.stockDistributionHome);
       }
+      
+      // Sauvegarder les données mises à jour dans localStorage
+      const dataToSave = getDashboardData();
+      localStorage.setItem('dashboardData', JSON.stringify(dataToSave));
     } catch (error) {
       console.error("Error updating dashboard data:", error);
     }
@@ -428,6 +470,25 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       stockDistributionFood: dashboardStockDistributionFood,
       stockDistributionHome: dashboardStockDistributionHome,
     };
+  };
+  
+  // Fonction pour réinitialiser les données à leur état par défaut
+  const resetDashboardData = () => {
+    try {
+      localStorage.removeItem('dashboardData');
+      setDashboardProducts(mockProducts);
+      setDashboardSalesData7Days(mockSalesData7Days);
+      setDashboardSalesData30Days(mockSalesData30Days);
+      setDashboardSalesData90Days(mockSalesData90Days);
+      setDashboardSalesDataYear(mockSalesDataYear);
+      setDashboardStockDistributionAll(mockStockDistributionAll);
+      setDashboardStockDistributionElectronics(mockStockDistributionElectronics);
+      setDashboardStockDistributionClothing(mockStockDistributionClothing);
+      setDashboardStockDistributionFood(mockStockDistributionFood);
+      setDashboardStockDistributionHome(mockStockDistributionHome);
+    } catch (error) {
+      console.error("Error resetting dashboard data:", error);
+    }
   };
 
   return (
@@ -453,6 +514,7 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
         filteredProducts,
         updateDashboardData,
         getDashboardData,
+        resetDashboardData,
       }}
     >
       {children}

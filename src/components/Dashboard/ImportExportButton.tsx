@@ -2,7 +2,7 @@
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DownloadCloud, UploadCloud, Info, Loader2 } from "lucide-react";
+import { DownloadCloud, UploadCloud, Info, Loader2, RefreshCw } from "lucide-react";
 import { useExcelData } from "@/context/ExcelDataContext";
 import { useDashboard } from "@/context/DashboardContext";
 import { toast } from "sonner";
@@ -10,7 +10,7 @@ import { toast } from "sonner";
 const ImportExportButton: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { handleImport, handleExport, isImporting } = useExcelData();
-  const { updateDashboardData, getDashboardData } = useDashboard();
+  const { updateDashboardData, getDashboardData, resetDashboardData } = useDashboard();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const triggerFileInput = () => {
@@ -23,8 +23,8 @@ const ImportExportButton: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        toast.info(`Importing file: ${file.name}`, {
-          description: "Please wait while we process your data...",
+        toast.info(`Importation du fichier: ${file.name}`, {
+          description: "Veuillez patienter pendant le traitement de vos données...",
           duration: 2000
         });
         
@@ -34,13 +34,13 @@ const ImportExportButton: React.FC = () => {
         if (excelData && excelData.products && excelData.products.length > 0) {
           console.log("Imported Excel data:", excelData);
           updateDashboardData(excelData);
-          toast.success(`Successfully imported ${excelData.products.length} products`);
+          toast.success(`${excelData.products.length} produits importés avec succès`);
         } else {
-          toast.error("Failed to import data. No valid products found.");
+          toast.error("Échec de l'importation. Aucun produit valide trouvé.");
         }
       } catch (error) {
         console.error("Error in import process:", error);
-        toast.error("An unexpected error occurred during import");
+        toast.error("Une erreur inattendue est survenue lors de l'importation");
       } finally {
         // Reset the input
         e.target.value = '';
@@ -55,19 +55,33 @@ const ImportExportButton: React.FC = () => {
       setIsPopoverOpen(false);
     } catch (error) {
       console.error("Error during export:", error);
-      toast.error("Failed to export data");
+      toast.error("Échec de l'exportation des données");
+    }
+  };
+  
+  const onReset = () => {
+    try {
+      const confirmed = window.confirm("Êtes-vous sûr de vouloir réinitialiser toutes les données? Cette action ne peut pas être annulée.");
+      if (confirmed) {
+        resetDashboardData();
+        setIsPopoverOpen(false);
+        toast.success("Données réinitialisées avec succès");
+      }
+    } catch (error) {
+      console.error("Error during reset:", error);
+      toast.error("Échec de la réinitialisation des données");
     }
   };
   
   const showExcelFormat = () => {
     toast(
       <div className="space-y-2">
-        <h3 className="font-medium">Required Excel Format</h3>
-        <p className="text-xs text-muted-foreground">Your Excel file should contain the following sheets:</p>
+        <h3 className="font-medium">Format Excel Requis</h3>
+        <p className="text-xs text-muted-foreground">Votre fichier Excel doit contenir les feuilles suivantes:</p>
         <ul className="text-xs list-disc pl-4 space-y-1">
           <li><b>Products:</b> id, name, sku, prices, stocks & margins</li>
-          <li><b>SalesData7Days, SalesData30Days, etc.:</b> daily sales data</li>
-          <li><b>StockDistAll, StockDistElec, etc.:</b> stock distribution data</li>
+          <li><b>SalesData7Days, SalesData30Days, etc.:</b> données de ventes journalières</li>
+          <li><b>StockDistAll, StockDistElec, etc.:</b> données de distribution des stocks</li>
         </ul>
       </div>,
       {
@@ -105,7 +119,7 @@ const ImportExportButton: React.FC = () => {
               ) : (
                 <UploadCloud className="mr-2 h-4 w-4" />
               )}
-              Import Excel Data
+              Importer des données Excel
             </Button>
             <Button 
               onClick={onExport} 
@@ -113,7 +127,7 @@ const ImportExportButton: React.FC = () => {
               variant="outline"
             >
               <DownloadCloud className="mr-2 h-4 w-4" />
-              Export to Excel
+              Exporter vers Excel
             </Button>
             <Button
               onClick={showExcelFormat}
@@ -122,7 +136,16 @@ const ImportExportButton: React.FC = () => {
               size="sm"
             >
               <Info className="mr-2 h-3 w-3" />
-              View Required Format
+              Voir le format requis
+            </Button>
+            <Button
+              onClick={onReset}
+              variant="destructive"
+              className="justify-start mt-2"
+              size="sm"
+            >
+              <RefreshCw className="mr-2 h-3 w-3" />
+              Réinitialiser les données
             </Button>
           </div>
         </PopoverContent>
