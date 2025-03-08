@@ -17,10 +17,11 @@ const App = () => (
     <ThemeProvider>
       <ExcelDataProvider>
         <TooltipProvider>
-          {/* Background blobs for designer look */}
-          <div className="blur-blob h-[300px] w-[300px] top-[10%] left-[-10%] z-0"></div>
-          <div className="blur-blob h-[400px] w-[400px] top-[40%] right-[-15%] z-0"></div>
-          <div className="blur-blob h-[250px] w-[250px] bottom-[5%] left-[15%] z-0 animation-delay-300"></div>
+          {/* Background blobs for designer look inspired by lynxjs.org */}
+          <div className="blur-blob bg-purple-500/20 h-[400px] w-[400px] top-[10%] left-[-15%] z-0"></div>
+          <div className="blur-blob bg-blue-500/20 h-[500px] w-[500px] top-[30%] right-[-20%] z-0"></div>
+          <div className="blur-blob bg-pink-500/10 h-[350px] w-[350px] bottom-[5%] left-[20%] z-0 animation-delay-300"></div>
+          <div className="blur-blob bg-indigo-500/15 h-[300px] w-[300px] top-[60%] right-[15%] z-0 animation-delay-600"></div>
           
           <Toaster />
           <Sonner />

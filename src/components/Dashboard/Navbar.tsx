@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
                 <span className="font-bold text-white">S</span>
               </div>
               <span className="font-semibold text-lg hidden sm:block">Stores Dashboard</span>

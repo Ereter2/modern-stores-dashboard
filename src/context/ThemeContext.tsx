@@ -24,6 +24,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     } else {
       document.documentElement.classList.remove("light-theme");
     }
+    
+    console.log(`Theme switched to: ${theme}`);
   }, [theme]);
 
   const toggleTheme = () => {

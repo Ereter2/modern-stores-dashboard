@@ -6,25 +6,25 @@
 @tailwind utilities;
 
 @layer base {
-  /* Light theme (default) */
+  /* Dark theme (default) */
   :root {
-    --background: 240 17% 11%;
+    --background: 222 47% 11%;
     --foreground: 210 20% 98%;
 
-    --card: 240 17% 14%;
+    --card: 224 47% 14%;
     --card-foreground: 210 20% 98%;
 
-    --popover: 240 17% 14%;
+    --popover: 224 47% 14%;
     --popover-foreground: 210 20% 98%;
 
     --primary: 265 100% 72%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 12% 22%;
+    --secondary: 224 42% 22%;
     --secondary-foreground: 210 20% 98%;
 
-    --muted: 240 10% 20%;
-    --muted-foreground: 240 10% 80%;
+    --muted: 224 40% 20%;
+    --muted-foreground: 224 40% 80%;
 
     --accent: 270 100% 75%;
     --accent-foreground: 0 0% 100%;
@@ -32,8 +32,8 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 20%;
-    --input: 240 10% 18%;
+    --border: 224 40% 20%;
+    --input: 224 40% 18%;
     --ring: 265 100% 72%;
 
     --positive: 142 71% 45%;
@@ -47,34 +47,34 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 240 17% 11%;
+    --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 20% 98%;
     --sidebar-primary: 265 100% 72%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 270 100% 75%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 240 10% 20%;
+    --sidebar-border: 224 40% 20%;
     --sidebar-ring: 265 100% 72%;
   }
 
   .light-theme {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 220 20% 97%;
+    --foreground: 224 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 224 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover-foreground: 224 47% 11%;
 
     --primary: 265 90% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 220 14% 90%;
+    --secondary-foreground: 224 35% 15%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 220 14% 90%;
+    --muted-foreground: 220 15% 46.1%;
 
     --accent: 270 80% 50%;
     --accent-foreground: 0 0% 100%;
@@ -82,8 +82,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
+    --border: 220 13% 85%;
+    --input: 220 13% 85%;
     --ring: 265 90% 50%;
 
     --positive: 142 71% 45%;
@@ -98,12 +98,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 3.9%;
+    --sidebar-foreground: 224 47% 11%;
     --sidebar-primary: 265 90% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 270 80% 50%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 240 5.9% 90%;
+    --sidebar-border: 220 13% 85%;
     --sidebar-ring: 265 90% 50%;
   }
 }
@@ -129,7 +129,9 @@
     bottom: 0;
     background: 
       radial-gradient(circle at 15% 50%, hsla(270, 100%, 75%, 0.15) 0%, transparent 25%),
-      radial-gradient(circle at 85% 30%, hsla(265, 100%, 72%, 0.1) 0%, transparent 30%);
+      radial-gradient(circle at 85% 30%, hsla(265, 100%, 72%, 0.1) 0%, transparent 30%),
+      radial-gradient(circle at 50% 70%, hsla(200, 100%, 70%, 0.1) 0%, transparent 35%),
+      radial-gradient(circle at 20% 20%, hsla(320, 100%, 75%, 0.1) 0%, transparent 20%);
     pointer-events: none;
     z-index: -1;
   }
@@ -143,11 +145,26 @@
     right: 0;
     bottom: 0;
     background-image: 
-      linear-gradient(to right, hsla(240, 10%, 70%, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, hsla(240, 10%, 70%, 0.05) 1px, transparent 1px);
-    background-size: 30px 30px;
+      linear-gradient(to right, hsla(224, 40%, 50%, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, hsla(224, 40%, 50%, 0.05) 1px, transparent 1px);
+    background-size: 25px 25px;
     pointer-events: none;
     z-index: -1;
+  }
+
+  /* Light theme specific background */
+  .light-theme body::before {
+    background: 
+      radial-gradient(circle at 15% 50%, hsla(270, 100%, 75%, 0.15) 0%, transparent 25%),
+      radial-gradient(circle at 85% 30%, hsla(265, 100%, 72%, 0.1) 0%, transparent 30%),
+      radial-gradient(circle at 50% 70%, hsla(200, 100%, 70%, 0.15) 0%, transparent 35%),
+      radial-gradient(circle at 20% 20%, hsla(320, 100%, 75%, 0.1) 0%, transparent 20%);
+  }
+
+  .light-theme body::after {
+    background-image: 
+      linear-gradient(to right, hsla(224, 30%, 70%, 0.2) 1px, transparent 1px),
+      linear-gradient(to bottom, hsla(224, 30%, 70%, 0.2) 1px, transparent 1px);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -156,10 +173,18 @@
 
   /* Making dark theme appear more modern */
   :root:not(.light-theme) .glass-card {
-    background: hsla(240, 17%, 14%, 0.5);
+    background: hsla(224, 47%, 14%, 0.7);
     backdrop-filter: blur(8px);
-    border: 1px solid hsla(240, 10%, 30%, 0.5);
+    border: 1px solid hsla(224, 40%, 30%, 0.5);
     box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Making light theme cards more visible */
+  .light-theme .glass-card {
+    background: hsla(0, 0%, 100%, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid hsla(220, 13%, 85%, 0.7);
+    box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -202,7 +227,7 @@
 
   /* Designer website styled blur effects */
   .blur-blob {
-    @apply absolute bg-accent/20 rounded-full filter blur-[80px] opacity-70 animate-pulse-slow;
+    @apply absolute rounded-full filter blur-[100px] opacity-70 animate-pulse-slow;
   }
 }
 
