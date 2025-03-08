@@ -17,6 +17,11 @@ const App = () => (
     <ThemeProvider>
       <ExcelDataProvider>
         <TooltipProvider>
+          {/* Background blobs for designer look */}
+          <div className="blur-blob h-[300px] w-[300px] top-[10%] left-[-10%] z-0"></div>
+          <div className="blur-blob h-[400px] w-[400px] top-[40%] right-[-15%] z-0"></div>
+          <div className="blur-blob h-[250px] w-[250px] bottom-[5%] left-[15%] z-0 animation-delay-300"></div>
+          
           <Toaster />
           <Sonner />
           <BrowserRouter>

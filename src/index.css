@@ -115,10 +115,51 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-primary-foreground;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Background pattern inspired by lynxjs.org */
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 15% 50%, hsla(270, 100%, 75%, 0.15) 0%, transparent 25%),
+      radial-gradient(circle at 85% 30%, hsla(265, 100%, 72%, 0.1) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Grid pattern overlay */
+  body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      linear-gradient(to right, hsla(240, 10%, 70%, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, hsla(240, 10%, 70%, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    pointer-events: none;
+    z-index: -1;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-tight;
+  }
+
+  /* Making dark theme appear more modern */
+  :root:not(.light-theme) .glass-card {
+    background: hsla(240, 17%, 14%, 0.5);
+    backdrop-filter: blur(8px);
+    border: 1px solid hsla(240, 10%, 30%, 0.5);
+    box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -158,4 +199,27 @@
   .shimmer-effect {
     @apply relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-shimmer before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent;
   }
+
+  /* Designer website styled blur effects */
+  .blur-blob {
+    @apply absolute bg-accent/20 rounded-full filter blur-[80px] opacity-70 animate-pulse-slow;
+  }
+}
+
+/* Added interactive hover effects for cards */
+.glass-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.3);
+}
+
+/* Remove default App.css styling that might conflict */
+#root {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
 }

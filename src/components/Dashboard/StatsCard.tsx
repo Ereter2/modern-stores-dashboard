@@ -30,32 +30,35 @@ const StatsCard: React.FC<StatsCardProps> = ({
   };
 
   const iconColorMap = {
-    products: "bg-blue-500/10 text-blue-500",
-    sales: "bg-green-500/10 text-green-500",
-    margin: "bg-violet-500/10 text-violet-500",
-    stock: "bg-orange-500/10 text-orange-500",
+    products: "bg-blue-500/10 text-blue-500 border border-blue-500/20",
+    sales: "bg-green-500/10 text-green-500 border border-green-500/20",
+    margin: "bg-violet-500/10 text-violet-500 border border-violet-500/20",
+    stock: "bg-orange-500/10 text-orange-500 border border-orange-500/20",
   };
 
   return (
     <div
       className={cn(
-        "rounded-lg glass-card p-5 transition-all hover:shadow-xl",
+        "rounded-lg glass-card p-5 transition-all hover:shadow-xl relative overflow-hidden",
         className
       )}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-center justify-between mb-3">
+      {/* Designer style decorative corner accent */}
+      <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-primary/10 to-accent/5 rounded-full blur-md"></div>
+      
+      <div className="flex items-center justify-between mb-3 relative z-10">
         <span className="text-sm text-muted-foreground font-medium">{title}</span>
         <div className={cn("p-2 rounded-full", iconColorMap[icon])}>
           {iconMap[icon]}
         </div>
       </div>
-      <div className="flex items-baseline">
+      <div className="flex items-baseline relative z-10">
         <h3 className="text-2xl font-bold">{value}</h3>
         {suffix && <span className="ml-1 text-muted-foreground text-sm">{suffix}</span>}
       </div>
       {typeof change !== "undefined" && (
-        <div className="mt-2 flex items-center">
+        <div className="mt-2 flex items-center relative z-10">
           {change > 0 ? (
             <div className="flex items-center text-positive text-xs font-medium">
               <ArrowUp className="h-3 w-3 mr-1" />
