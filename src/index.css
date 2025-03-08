@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -74,7 +73,7 @@
     --secondary-foreground: 224 35% 15%;
 
     --muted: 220 14% 90%;
-    --muted-foreground: 220 15% 46.1%;
+    --muted-foreground: 224 30% 25%;
 
     --accent: 270 80% 50%;
     --accent-foreground: 0 0% 100%;
@@ -119,7 +118,6 @@
     overflow-x: hidden;
   }
 
-  /* Background pattern inspired by lynxjs.org */
   body::before {
     content: '';
     position: absolute;
@@ -136,7 +134,6 @@
     z-index: -1;
   }
 
-  /* Grid pattern overlay */
   body::after {
     content: '';
     position: absolute;
@@ -152,7 +149,6 @@
     z-index: -1;
   }
 
-  /* Light theme specific background */
   .light-theme body::before {
     background: 
       radial-gradient(circle at 15% 50%, hsla(270, 100%, 75%, 0.15) 0%, transparent 25%),
@@ -171,7 +167,6 @@
     @apply font-display tracking-tight;
   }
 
-  /* Making dark theme appear more modern */
   :root:not(.light-theme) .glass-card {
     background: hsla(224, 47%, 14%, 0.7);
     backdrop-filter: blur(8px);
@@ -179,9 +174,8 @@
     box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
   }
 
-  /* Making light theme cards more visible */
   .light-theme .glass-card {
-    background: hsla(0, 0%, 100%, 0.8);
+    background: hsla(0, 0%, 100%, 0.85);
     backdrop-filter: blur(8px);
     border: 1px solid hsla(220, 13%, 85%, 0.7);
     box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.15);
@@ -225,13 +219,11 @@
     @apply relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-shimmer before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent;
   }
 
-  /* Designer website styled blur effects */
   .blur-blob {
     @apply absolute rounded-full filter blur-[100px] opacity-70 animate-pulse-slow;
   }
 }
 
-/* Added interactive hover effects for cards */
 .glass-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -241,7 +233,6 @@
   box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.3);
 }
 
-/* Remove default App.css styling that might conflict */
 #root {
   max-width: 100%;
   margin: 0;

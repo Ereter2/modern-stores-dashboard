@@ -25,6 +25,15 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       document.documentElement.classList.remove("light-theme");
     }
     
+    // Update text colors directly for better contrast in light mode
+    if (theme === "light") {
+      document.documentElement.style.setProperty('--foreground', '224 47% 11%');
+      document.documentElement.style.setProperty('--muted-foreground', '224 30% 25%');
+    } else {
+      document.documentElement.style.setProperty('--foreground', '210 20% 98%');
+      document.documentElement.style.setProperty('--muted-foreground', '224 40% 80%');
+    }
+    
     console.log(`Theme switched to: ${theme}`);
   }, [theme]);
 
