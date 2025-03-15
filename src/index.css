@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -16,7 +17,7 @@
     --popover: 224 47% 14%;
     --popover-foreground: 210 20% 98%;
 
-    --primary: 265 100% 72%;
+    --primary: 265 100% 75%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 224 42% 22%;
@@ -25,7 +26,7 @@
     --muted: 224 40% 20%;
     --muted-foreground: 224 40% 80%;
 
-    --accent: 270 100% 75%;
+    --accent: 270 100% 80%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -48,9 +49,9 @@
 
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 265 100% 72%;
+    --sidebar-primary: 265 100% 75%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 100% 75%;
+    --sidebar-accent: 270 100% 80%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 224 40% 20%;
     --sidebar-ring: 265 100% 72%;
@@ -126,10 +127,9 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 15% 50%, hsla(270, 100%, 75%, 0.15) 0%, transparent 25%),
-      radial-gradient(circle at 85% 30%, hsla(265, 100%, 72%, 0.1) 0%, transparent 30%),
-      radial-gradient(circle at 50% 70%, hsla(200, 100%, 70%, 0.1) 0%, transparent 35%),
-      radial-gradient(circle at 20% 20%, hsla(320, 100%, 75%, 0.1) 0%, transparent 20%);
+      radial-gradient(circle at 15% 50%, hsla(270, 100%, 75%, 0.08) 0%, transparent 25%),
+      radial-gradient(circle at 85% 30%, hsla(265, 100%, 72%, 0.08) 0%, transparent 30%),
+      radial-gradient(circle at 50% 70%, hsla(260, 100%, 70%, 0.08) 0%, transparent 35%);
     pointer-events: none;
     z-index: -1;
   }
@@ -153,8 +153,7 @@
     background: 
       radial-gradient(circle at 15% 50%, hsla(270, 100%, 75%, 0.15) 0%, transparent 25%),
       radial-gradient(circle at 85% 30%, hsla(265, 100%, 72%, 0.1) 0%, transparent 30%),
-      radial-gradient(circle at 50% 70%, hsla(200, 100%, 70%, 0.15) 0%, transparent 35%),
-      radial-gradient(circle at 20% 20%, hsla(320, 100%, 75%, 0.1) 0%, transparent 20%);
+      radial-gradient(circle at 50% 70%, hsla(260, 100%, 70%, 0.15) 0%, transparent 35%);
   }
 
   .light-theme body::after {
@@ -168,10 +167,10 @@
   }
 
   :root:not(.light-theme) .glass-card {
-    background: hsla(224, 47%, 14%, 0.7);
+    background: hsla(224, 47%, 14%, 0.9);
     backdrop-filter: blur(8px);
     border: 1px solid hsla(224, 40%, 30%, 0.5);
-    box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 20px -6px rgba(0, 0, 0, 0.5);
   }
 
   .light-theme .glass-card {
@@ -184,7 +183,7 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-card/80 backdrop-blur-md border border-white/5 shadow-lg;
+    @apply bg-card/90 backdrop-blur-md border border-white/5 shadow-lg;
   }
   
   .text-balance {
@@ -229,8 +228,8 @@
 }
 
 .glass-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.3);
 }
 
 #root {

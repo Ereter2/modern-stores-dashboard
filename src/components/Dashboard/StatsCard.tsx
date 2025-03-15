@@ -30,23 +30,20 @@ const StatsCard: React.FC<StatsCardProps> = ({
   };
 
   const iconColorMap = {
-    products: "bg-blue-500/10 text-blue-500 border border-blue-500/20",
-    sales: "bg-green-500/10 text-green-500 border border-green-500/20",
-    margin: "bg-violet-500/10 text-violet-500 border border-violet-500/20",
-    stock: "bg-orange-500/10 text-orange-500 border border-orange-500/20",
+    products: "bg-blue-500/20 text-blue-500 border border-blue-500/20",
+    sales: "bg-green-500/20 text-green-500 border border-green-500/20",
+    margin: "bg-violet-500/20 text-violet-500 border border-violet-500/20",
+    stock: "bg-orange-500/20 text-orange-500 border border-orange-500/20",
   };
 
   return (
     <div
       className={cn(
-        "rounded-lg glass-card p-5 transition-all hover:shadow-xl relative overflow-hidden",
+        "rounded-lg glass-card p-5 transition-all relative overflow-hidden",
         className
       )}
       style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Designer style decorative corner accent */}
-      <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-primary/10 to-accent/5 rounded-full blur-md"></div>
-      
       <div className="flex items-center justify-between mb-3 relative z-10">
         <span className="text-sm text-muted-foreground font-medium">{title}</span>
         <div className={cn("p-2 rounded-full", iconColorMap[icon])}>
