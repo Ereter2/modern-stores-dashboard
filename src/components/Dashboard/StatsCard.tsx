@@ -40,57 +40,68 @@ const StatsCard: React.FC<StatsCardProps> = ({
   const getGlowColor = () => {
     switch (icon) {
       case "products":
-        return "before:bg-purple-600/30";
+        return "#8B5CF6";
       case "sales":
-        return "before:bg-purple-600/30";
+        return "#8B5CF6";
       case "margin":
-        return "before:bg-purple-600/30";
+        return "#8B5CF6";
       case "stock":
-        return "before:bg-purple-600/30";
+        return "#8B5CF6";
       default:
-        return "before:bg-purple-600/30";
+        return "#8B5CF6";
     }
   };
 
   return (
     <div
       className={cn(
-        "rounded-lg glass-card p-5 transition-all relative overflow-hidden",
-        "before:absolute before:inset-0 before:rounded-lg before:blur-xl before:transform before:scale-[0.85] before:opacity-70 before:z-0",
-        getGlowColor(),
+        "relative",
         className
       )}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-center justify-between mb-3 relative z-10">
-        <span className="text-sm text-muted-foreground font-medium">{title}</span>
-        <div className={cn("p-2 rounded-full", iconColorMap[icon])}>
-          {iconMap[icon]}
+      {/* Background glow effect */}
+      <div 
+        className="absolute inset-0 rounded-lg blur-xl z-0 opacity-80"
+        style={{ 
+          backgroundColor: getGlowColor(),
+          transform: 'scale(0.95)',
+          animation: 'pulse 3s infinite alternate',
+        }}
+      />
+      
+      {/* Card content */}
+      <div className="rounded-lg glass-card p-5 relative z-10 h-full backdrop-blur-sm shadow-lg border border-white/10">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm text-muted-foreground font-medium">{title}</span>
+          <div className={cn("p-2 rounded-full", iconColorMap[icon])}>
+            {iconMap[icon]}
+          </div>
         </div>
-      </div>
-      <div className="flex items-baseline relative z-10">
-        <h3 className="text-2xl font-bold">{value}</h3>
-        {suffix && <span className="ml-1 text-muted-foreground text-sm">{suffix}</span>}
-      </div>
-      {typeof change !== "undefined" && (
-        <div className="mt-2 flex items-center relative z-10">
-          {change > 0 ? (
-            <div className="flex items-center text-positive text-xs font-medium">
-              <ArrowUp className="h-3 w-3 mr-1" />
-              <span>+{change}%</span>
-            </div>
-          ) : change < 0 ? (
-            <div className="flex items-center text-negative text-xs font-medium">
-              <ArrowDown className="h-3 w-3 mr-1" />
-              <span>{change}%</span>
-            </div>
-          ) : (
-            <div className="flex items-center text-muted-foreground text-xs font-medium">
-              <span>No change</span>
-            </div>
-          )}
+        <div className="flex items-baseline">
+          <h3 className="text-2xl font-bold">{value}</h3>
+          {suffix && <span className="ml-1 text-muted-foreground text-sm">{suffix}</span>}
         </div>
-      )}
+        {typeof change !== "undefined" && (
+          <div className="mt-2 flex items-center">
+            {change > 0 ? (
+              <div className="flex items-center text-positive text-xs font-medium">
+                <ArrowUp className="h-3 w-3 mr-1" />
+                <span>+{change}%</span>
+              </div>
+            ) : change < 0 ? (
+              <div className="flex items-center text-negative text-xs font-medium">
+                <ArrowDown className="h-3 w-3 mr-1" />
+                <span>{change}%</span>
+              </div>
+            ) : (
+              <div className="flex items-center text-muted-foreground text-xs font-medium">
+                <span>No change</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
