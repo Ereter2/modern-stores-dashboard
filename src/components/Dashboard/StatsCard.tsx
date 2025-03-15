@@ -36,10 +36,28 @@ const StatsCard: React.FC<StatsCardProps> = ({
     stock: "bg-orange-500/20 text-orange-500 border border-orange-500/20",
   };
 
+  // Get the glow color based on the icon type
+  const getGlowColor = () => {
+    switch (icon) {
+      case "products":
+        return "before:bg-purple-600/30";
+      case "sales":
+        return "before:bg-purple-600/30";
+      case "margin":
+        return "before:bg-purple-600/30";
+      case "stock":
+        return "before:bg-purple-600/30";
+      default:
+        return "before:bg-purple-600/30";
+    }
+  };
+
   return (
     <div
       className={cn(
         "rounded-lg glass-card p-5 transition-all relative overflow-hidden",
+        "before:absolute before:inset-0 before:rounded-lg before:blur-xl before:transform before:scale-[0.85] before:opacity-70 before:z-0",
+        getGlowColor(),
         className
       )}
       style={{ animationDelay: `${delay}ms` }}

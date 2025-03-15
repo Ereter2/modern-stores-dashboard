@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -8,16 +7,16 @@
 @layer base {
   /* Dark theme (default) */
   :root {
-    --background: 0 0% 6%; /* Changed to black background */
+    --background: 0 0% 6%; /* Black background */
     --foreground: 210 20% 98%;
 
-    --card: 0 0% 9%; /* Changed to darker black for cards */
+    --card: 0 0% 9%; /* Darker black for cards */
     --card-foreground: 210 20% 98%;
 
     --popover: 0 0% 9%;
     --popover-foreground: 210 20% 98%;
 
-    --primary: 265 100% 75%; /* Kept vibrant purple */
+    --primary: 265 100% 75%; /* Vibrant purple */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 15%; /* Adjusted for black theme */
@@ -179,6 +178,28 @@
     border: 1px solid hsla(220, 13%, 85%, 0.7);
     box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.15);
   }
+  
+  .glowing-card {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .glowing-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(139, 92, 246, 0.6), transparent 70%);
+    filter: blur(20px);
+    transform: scale(0.85);
+    z-index: 0;
+    opacity: 0.8;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .glowing-card:hover::before {
+    opacity: 1;
+    transform: scale(0.9);
+  }
 }
 
 @layer utilities {
@@ -221,6 +242,14 @@
   .blur-blob {
     @apply absolute rounded-full filter blur-[100px] opacity-70 animate-pulse-slow;
   }
+  
+  .purple-glow {
+    @apply before:absolute before:inset-0 before:rounded-lg before:bg-purple-600/40 before:blur-xl before:transform before:scale-[0.85] before:opacity-70 before:z-0;
+  }
+  
+  .purple-glow-intense {
+    @apply before:absolute before:inset-0 before:rounded-lg before:bg-purple-600/60 before:blur-xl before:transform before:scale-[0.9] before:opacity-80 before:z-0;
+  }
 }
 
 .glass-card {
@@ -238,3 +267,4 @@
   padding: 0;
   text-align: left;
 }
+
