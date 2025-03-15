@@ -45,65 +45,83 @@ const StockChart: React.FC = () => {
     color: CHART_COLORS[index % CHART_COLORS.length],
   }));
 
-  return (
-    <div className="glass-card rounded-lg h-full animate-slide-up animation-delay-500">
-      <div className="p-5 border-b border-border flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Stock Distribution</h2>
-        <FilterDropdown
-          label="Category"
-          value={categoryFilter}
-          options={categoryOptions}
-          onChange={(value) => setCategoryFilter(value as any)}
-        />
-      </div>
-      <div className="p-5 h-[400px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={colorizedData}
-              cx="50%"
-              cy="50%"
-              innerRadius={80}
-              outerRadius={120}
-              fill="#8884d8"
-              paddingAngle={2}
-              dataKey="value"
-              stroke="transparent"
-              labelLine={false}
-              label={({
-                cx,
-                cy,
-                midAngle,
-                innerRadius,
-                outerRadius,
-                percent,
-                name,
-              }) => {
-                const radius = innerRadius + (outerRadius - innerRadius) * 1.3;
-                const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+  // Get the glow color
+  const getGlowColor = () => {
+    return "#8B5CF6";
+  };
 
-                return (
-                  <text
-                    x={x}
-                    y={y}
-                    fill="currentColor"
-                    textAnchor={x > cx ? "start" : "end"}
-                    dominantBaseline="central"
-                    className="text-xs"
-                  >
-                    {`${name} (${(percent * 100).toFixed(0)}%)`}
-                  </text>
-                );
-              }}
-            >
-              {colorizedData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-          </PieChart>
-        </ResponsiveContainer>
+  return (
+    <div className="relative h-full animate-slide-up animation-delay-500">
+      {/* Background glow effect */}
+      <div 
+        className="absolute inset-0 rounded-lg blur-xl z-0 opacity-80"
+        style={{ 
+          backgroundColor: getGlowColor(),
+          transform: 'scale(0.95)',
+          animation: 'pulse 3s infinite alternate',
+        }}
+      />
+      
+      {/* Card content */}
+      <div className="glass-card rounded-lg h-full relative z-10 backdrop-blur-sm shadow-lg border border-white/10">
+        <div className="p-5 border-b border-border flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Stock Distribution</h2>
+          <FilterDropdown
+            label="Category"
+            value={categoryFilter}
+            options={categoryOptions}
+            onChange={(value) => setCategoryFilter(value as any)}
+          />
+        </div>
+        <div className="p-5 h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={colorizedData}
+                cx="50%"
+                cy="50%"
+                innerRadius={80}
+                outerRadius={120}
+                fill="#8884d8"
+                paddingAngle={2}
+                dataKey="value"
+                stroke="transparent"
+                labelLine={false}
+                label={({
+                  cx,
+                  cy,
+                  midAngle,
+                  innerRadius,
+                  outerRadius,
+                  percent,
+                  name,
+                }) => {
+                  const radius = innerRadius + (outerRadius - innerRadius) * 1.3;
+                  const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                  const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+
+                  return (
+                    <text
+                      x={x}
+                      y={y}
+                      fill="currentColor"
+                      textAnchor={x > cx ? "start" : "end"}
+                      dominantBaseline="central"
+                      className="text-xs"
+                    >
+                      {`${name} (${(percent * 100).toFixed(0)}%)`}
+                    </text>
+                  );
+                }}
+              >
+                {colorizedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
